@@ -10,10 +10,10 @@ export default class Aim {
     this.debug = false;
   }
 
-  start(x, y, level, done) {
+  start(x, y, done) {
     Object.assign(this, { x, y, done, active: true, r: C.AIM_R_START });
-    this.speed = Phaser.Math.FloatBetween(C.AIM_SPEED_MIN, C.AIM_SPEED_MAX) * C.AIM_SPEED_LEVEL_MULT ** (level - 1);
-    this.change = level >= 3 && Math.random() < 0.7
+    this.speed = Phaser.Math.FloatBetween(C.AIM_SPEED_MIN, C.AIM_SPEED_MAX);
+    this.change = Math.random() < C.AIM_CHANGE_CHANCE
       ? { at: Phaser.Math.FloatBetween(C.AIM_R_OUT + 4, C.AIM_R_START - 10), mult: Phaser.Utils.Array.GetRandom([0.55, 1.7]) }
       : null;
     this.draw();
@@ -40,11 +40,11 @@ export default class Aim {
   }
 
   draw() {
-    const { g, x, y } = this;
+    const { g, x, y } = this, px = 1 / g.scene.cameras.main.zoom;
     g.clear();
     g.lineStyle(HALF * 2, 0xffffff, this.debug ? 0.3 : 0.12).strokeCircle(x, y, MID);
-    if (this.debug) g.lineStyle(Math.max(1, HALF * 2 * C.AIM_PERFECT), 0x00ff00, 0.7).strokeCircle(x, y, MID);
-    g.lineStyle(1, 0xffffff).strokeCircle(x, y, C.AIM_R_IN).strokeCircle(x, y, C.AIM_R_OUT);
-    g.lineStyle(1, 0xffe040).strokeCircle(x, y, this.r);
+    if (this.debug) g.lineStyle(Math.max(px, HALF * 2 * C.AIM_PERFECT), 0x00ff00, 0.7).strokeCircle(x, y, MID);
+    g.lineStyle(px, 0xffffff).strokeCircle(x, y, C.AIM_R_IN).strokeCircle(x, y, C.AIM_R_OUT);
+    g.lineStyle(px, 0xffe040).strokeCircle(x, y, this.r);
   }
 }

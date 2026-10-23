@@ -14,23 +14,22 @@ Top-down pixel-art browser game. The player is an asteroid wiping out dinosaurs,
 - Keep the game playable after every change
 
 ## Core loop
-1. Player sees the map from above; dinosaurs are tiny, barely visible pixel clusters that wander
-2. Player picks a target spot (click / arrow-key cursor)
-3. **Aim minigame (rhythm):** two fixed concentric circles around the target form a ring zone. A third indicator circle starts outside both and shrinks. Press **Space** while the indicator is between the two circles
+1. One big map (`MAP_W`×`MAP_H`, many screens) seen from above; ~250 dinosaurs are tiny, barely visible pixel clusters that wander in herds
+2. Pan (mouse drag / arrow-key cursor pushing the edge) and zoom (wheel, Q/E, 1×–4× integer steps). Dinos switch to more detailed sprites as you zoom in. Minimap shows the current view
+3. Player picks a target spot (click / arrow-key cursor)
+4. **Aim minigame (rhythm):** two fixed concentric circles around the target form a ring zone. A third indicator circle starts outside both and shrinks. Press **Space** while the indicator is between the two circles
    - Accuracy = how close to the ring's center line the press was
    - Impact lands offset from the target proportional to the error; a miss (outside the ring) lands far off
-   - Shrink speed varies per throw (and can speed up/slow down mid-shrink at higher levels)
-4. Asteroid falls → crater (destroyed terrain pixels) + blast radius kills dinos
-5. Repeat
+   - Shrink speed varies per throw, and sometimes speeds up/slows down mid-shrink
+5. Asteroid falls → crater (destroyed terrain pixels) + blast radius kills dinos
+6. Infinite rocks, but a `ROCK_COOLDOWN` (15 s) reload after each throw; scouting is allowed while reloading
 
-## Win / lose
-- Level cleared when **all dinosaurs are dead** OR **the map is destroyed** (≥ `MAP_DESTROYED_PCT` of terrain cratered, default 90%)
-- Limited asteroids per level (proposed); out of asteroids with dinos alive = level failed
+## Win
+- **All dinosaurs dead** OR **the map is destroyed** (≥ `MAP_DESTROYED_PCT` of terrain cratered) → victory screen with rocks thrown and time
+- No levels and no lose condition for now (playtest decision: one big map, infinite rocks with cooldown)
+- Old idea, parked: escape cutscene where a survivor runs off "to warn his friends" — could return as the trigger for dinos gaining defenses over time
 
-## Level transition
-After a level is cleared, one surviving dino is seen scurrying off the map edge "to warn his friends" (short cutscene with a "!!!" speech bubble), then the next level starts. Story hook for why the next dinos are better prepared.
-
-## Dinosaur defenses (unlocked by level)
+## Dinosaur defenses (unlock trigger TBD now that there are no levels)
 | Defense | Effect |
 |---|---|
 | Scatter | Dinos run from the impact shadow during the fall |
@@ -43,7 +42,7 @@ Ideas list (not yet approved): decoys, radar (makes aim ring faster), jamming (i
 
 ## Milestones
 1. **M1 – Playable core:** static pixel map, ~12 wandering dino dots, target select, rhythm aim, crater + kills, kill counter
-2. **M2 – Levels:** win/lose conditions, asteroid count, level screen, increasing aim difficulty
+2. **M2 – Big map:** one large map, zoom + pan + minimap, detailed dino sprites when zoomed, infinite rocks with cooldown, victory screen
 3. **M3 – First defenses:** scatter + burrowing
 4. **M4 – Settlements:** towns, force fields
 5. **M5 – Artillery**

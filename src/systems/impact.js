@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import C, { W } from '../config.js';
+import C from '../config.js';
 
 const FIRE = [0xffa020, 0xff5010, 0xffe060];
 
@@ -10,7 +10,7 @@ export const puff = (scene, x, y, color, ms) => {
 
 export function dropAsteroid(scene, x, y, onImpact) {
   const shadow = scene.add.ellipse(x, y, 12, 6, 0x000000, 0.5).setScale(0).setDepth(5);
-  const rock = scene.add.image(W + 8, -8, 'asteroid').setDepth(15);
+  const v = scene.cameras.main.worldView, rock = scene.add.image(v.right + 8, v.y - 8, 'asteroid').setDepth(15);
   const trail = scene.time.addEvent({
     delay: 16, loop: true,
     callback: () => puff(scene, rock.x + Phaser.Math.Between(0, 3), rock.y - Phaser.Math.Between(0, 3), Phaser.Utils.Array.GetRandom(FIRE), 250)

@@ -3,9 +3,10 @@ import C from '../config.js';
 
 const COLORS = [0x6e7837, 0x786440, 0x5f6e30];
 const DEBUG_TINT = 0xff2020;
+const LOD = [[3, 'dino-l', 0.25], [1.75, 'dino-m', 0.5], [0, 'dino', 1]];
 const between = Phaser.Math.FloatBetween;
 
-// Behaviors run every frame as (dino, dt, dinos); later levels can push more (scatter, burrow...)
+// Behaviors run every frame as (dino, dt, dinos); later milestones can push more (scatter, burrow...)
 export const wander = (d, dt, { terrain }) => {
   if (d.wait > 0) { d.wait -= dt; return; }
   const dx = d.tx - d.x, dy = d.ty - d.y, dist = Math.hypot(dx, dy);
@@ -18,15 +19,15 @@ export const wander = (d, dt, { terrain }) => {
     return;
   }
   const step = Math.min(dist, (C.DINO_SPEED * dt) / 1000), nx = d.x + (dx / dist) * step, ny = d.y + (dy / dist) * step;
-  if (terrain.walkable(nx, ny)) { d.x = nx; d.y = ny; d.moving = true; } else { d.tx = d.x; d.ty = d.y; }
+  if (terrain.walkable(nx, ny)) { d.x = nx; d.y = ny; d.moving = true; d.left = dx < 0; } else { d.tx = d.x; d.ty = d.y; }
 };
 
 export default class Dinos {
   constructor(scene, terrain, count, debug) {
     Object.assign(this, { scene, terrain, debug, list: [] });
-    const { w, h } = terrain, top = C.HUD_H;
-    for (let tries = 0; this.list.length < count && tries < 2000; tries++) {
-      const cx = between(4, w - 4), cy = between(top + 4, top + h - 4);
+    const { w, h } = terrain;
+    for (let tries = 0; this.list.length < count && tries < 20000; tries++) {
+      const cx = between(4, w - 4), cy = between(4, h - 4);
       if (!terrain.walkable(cx, cy)) continue;
       const size = Math.min(Phaser.Math.Between(2, 5), count - this.list.length);
       for (let i = 0, t = 0; i < size && t < 50; t++) {
@@ -49,12 +50,15 @@ export default class Dinos {
     this.list.forEach(d => d.sprite.setTint(on ? DEBUG_TINT : d.tint));
   }
 
-  update(dt) {
+  // Sprites get more detailed (finer pixels) as the camera zooms in
+  update(dt, zoom = 1) {
+    const [, key, s] = LOD.find(l => zoom >= l[0]);
     for (const d of this.list) {
       d.moving = false;
       d.behaviors.forEach(b => b(d, dt, this));
       if (d.moving && (d.anim += dt) > 180) { d.anim = 0; d.step ^= 1; }
-      d.sprite.setPosition(Math.round(d.x), Math.round(d.y) - d.step);
+      if (d.sprite.texture.key !== key) d.sprite.setTexture(key).setScale(s);
+      d.sprite.setFlipX(!!d.left).setPosition(Math.round(d.x / s) * s, Math.round(d.y / s) * s - d.step * s);
     }
   }
 

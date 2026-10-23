@@ -1,4 +1,4 @@
-import C, { W, H } from '../config.js';
+import C from '../config.js';
 
 export const T = { WATER: 0, SAND: 1, GRASS: 2, FOREST: 3, ROCK: 4, DEEP: 5 };
 const LAND = [T.SAND, T.GRASS, T.FOREST];
@@ -25,8 +25,8 @@ const valueNoise = (rand, cell, w, h) => {
 };
 
 export default class Terrain {
-  constructor(scene, key, seed) {
-    this.w = W; this.h = H - C.HUD_H; this.key = key;
+  constructor(scene, key, seed, w = C.MAP_W, h = C.MAP_H, scale = 1) {
+    Object.assign(this, { w, h, key, scale });
     this.rand = rng(seed);
     if (scene.textures.exists(key)) scene.textures.remove(key);
     this.tex = scene.textures.createCanvas(key, this.w, this.h);
@@ -36,14 +36,14 @@ export default class Terrain {
     this.destroyed = new Uint8Array(this.w * this.h);
     this.count = 0;
     this.generate();
-    this.image = scene.add.image(0, C.HUD_H, key).setOrigin(0);
+    this.image = scene.add.image(0, 0, key).setOrigin(0);
   }
 
   generate() {
-    const { w, h, rand } = this, n = c => valueNoise(rand, c, w, h);
-    const n1 = n(40), n2 = n(16), n3 = n(6), moist = n(30), patch = n(5);
+    const { w, h, rand } = this, n = c => valueNoise(rand, Math.max(3, c * this.scale), w, h);
+    const n0 = n(110), n1 = n(40), n2 = n(16), n3 = n(6), moist = n(60), patch = n(5);
     for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
-      const e = (0.55 * n1(x, y) + 0.3 * n2(x, y) + 0.15 * n3(x, y) - 0.5) * 1.8 + 0.5;
+      const e = (0.5 * n0(x, y) + 0.3 * n1(x, y) + 0.14 * n2(x, y) + 0.06 * n3(x, y) - 0.5) * 1.8 + 0.5;
       const [t, c] = e < 0.26 ? [T.WATER, COL.deep] : e < 0.33 ? [T.WATER, COL.water] : e < 0.38 ? [T.SAND, COL.sand]
         : e > 0.8 ? [T.ROCK, COL.rock] : moist(x, y) > 0.6 ? [T.FOREST, COL.forest]
         : [T.GRASS, patch(x, y) > 0.5 ? COL.grass1 : COL.grass2];
@@ -59,10 +59,10 @@ export default class Terrain {
     d[i * 4] = r; d[i * 4 + 1] = g; d[i * 4 + 2] = b; d[i * 4 + 3] = 255;
   }
 
-  flush() { this.ctx.putImageData(this.img, 0, 0); this.tex.refresh(); }
+  flush(x = 0, y = 0, w = this.w, h = this.h) { this.ctx.putImageData(this.img, 0, 0, x, y, w, h); this.tex.refresh(); }
 
   idx(x, y) {
-    const px = Math.floor(x), py = Math.floor(y - C.HUD_H);
+    const px = Math.floor(x), py = Math.floor(y);
     return px < 0 || py < 0 || px >= this.w || py >= this.h ? -1 : py * this.w + px;
   }
 
@@ -79,7 +79,7 @@ export default class Terrain {
       const c = k < 0.4 ? [18, 12, 10] : k < 0.75 ? [48, 30, 20] : [78, 52, 30];
       this.setPx(i, c[0] + j, c[1] + j * 0.7, c[2] + j * 0.5);
     }
-    this.flush();
+    this.flush(ox - R, oy - R, R * 2 + 1, R * 2 + 1);
   }
 
   destroyedPct() { return this.count / (this.w * this.h); }

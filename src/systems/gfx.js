@@ -17,7 +17,7 @@ const GLYPHS = {
   ':': '000010000010000', "'": '010010000000000', '?': '110001010000010', '/': '001001010100100'
 };
 
-const PAL = { w: '#ffffff', g: '#8a8a8a', d: '#5a5a5a', o: '#ff8a20', y: '#ffd040' };
+const PAL = { w: '#ffffff', s: '#9a9a9a', k: '#101010', g: '#8a8a8a', d: '#5a5a5a', o: '#ff8a20', y: '#ffd040' };
 
 const pixels = (tx, key, rows) => {
   const c = tx.createCanvas(key, rows[0].length, rows.length), ctx = c.getContext();
@@ -42,6 +42,11 @@ export function initGfx(scene) {
   }));
 
   pixels(tx, 'dino', ['www', 'w w']);
+  pixels(tx, 'dino-m', ['....ww', 's..www', '.swww.', '..s.s.']);
+  pixels(tx, 'dino-l', [
+    '........www.', '.......wwkww', 's......wwwww', 'ss....www...',
+    '.sswwwwww...', '..swwwwws...', '....s..s....', '....ss.ss...'
+  ]);
   pixels(tx, 'asteroid', [' ggd ', 'gdggd', 'ogdgg', 'yogdg', ' yog ']);
   pixels(tx, 'cross', ['   w   ', '   w   ', '       ', 'ww   ww', '       ', '   w   ', '   w   ']);
 }
