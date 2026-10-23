@@ -10,9 +10,9 @@ export default class Aim {
     this.debug = false;
   }
 
-  start(x, y, done) {
+  start(x, y, done, speedMult = 1) {
     Object.assign(this, { x, y, done, active: true, r: C.AIM_R_START });
-    this.speed = Phaser.Math.FloatBetween(C.AIM_SPEED_MIN, C.AIM_SPEED_MAX);
+    this.speed = Phaser.Math.FloatBetween(C.AIM_SPEED_MIN, C.AIM_SPEED_MAX) * speedMult;
     this.change = Math.random() < C.AIM_CHANGE_CHANCE
       ? { at: Phaser.Math.FloatBetween(C.AIM_R_OUT + 4, C.AIM_R_START - 10), mult: Phaser.Utils.Array.GetRandom([0.55, 1.7]) }
       : null;

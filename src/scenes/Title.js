@@ -20,8 +20,8 @@ export default class Title extends Phaser.Scene {
     this.add.rectangle(0, 50, W, 76, 0x000000, 0.6).setOrigin(0).setDepth(29);
     text(this, W / 2, 70, 'DINO DOOM', 0xff8a20).setOrigin(0.5).setScale(4);
     text(this, W / 2, 96, 'Press Space', 0xffe040).setOrigin(0.5);
-    text(this, W / 2, 108, 'Click to target · Space to strike', 0xaaaaaa).setOrigin(0.5);
-    text(this, W / 2, 116, 'Drag to move · Wheel or Q/E to zoom', 0xaaaaaa).setOrigin(0.5);
+    text(this, W / 2, 108, 'Click/tap to target · again to strike', 0xaaaaaa).setOrigin(0.5);
+    text(this, W / 2, 116, 'Drag to move · Wheel or Q/E zoom · U upgrades', 0xaaaaaa).setOrigin(0.5);
 
     const start = () => this.scene.start('Game');
     this.input.keyboard.once('keydown-SPACE', start);

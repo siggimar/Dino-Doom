@@ -29,21 +29,29 @@ Top-down pixel-art browser game. The player is an asteroid wiping out dinosaurs,
 - No levels and no lose condition for now (playtest decision: one big map, infinite rocks with cooldown)
 - Old idea, parked: escape cutscene where a survivor runs off "to warn his friends" — could return as the trigger for dinos gaining defenses over time
 
-## Dinosaur defenses (unlock trigger TBD now that there are no levels)
-| Defense | Effect |
-|---|---|
-| Scatter | Dinos run from the impact shadow during the fall |
-| Burrowing | Dinos dig in; only a near-direct hit kills them |
-| Force field | Dome over settlements; absorbs hits, needs several or a perfect throw to break |
-| Artillery | Fires at the incoming asteroid, knocking it off course. Upgrades in tiers: T1 small shells, poor aim → T2 bigger bombs, even worse aim → T3+ big bombs, accuracy improves per tier |
-| Settlements | Dinos cluster into towns, which hold force fields/artillery |
+## Upgrades (bones economy)
+- Each kill = `BONES_PER_KILL` bone. U key / HUD button opens a pause menu; upgrade cost = `cost × (level + 1)`, max 4 levels
+- Fast Reload, Bigger Boom, Steady Aim, Cluster Rock (mini rocks around the hit, which arrive with no shadow, so Scatter can't dodge them)
+- Every new defense should have an upgrade that counters it
 
-Ideas list (not yet approved): decoys, radar (makes aim ring faster), jamming (indicator wobbles), egg nests that respawn dinos, tunnels between settlements, camouflage in forests.
+## Dino-Defences™
+The dinos fight back as their losses grow: each defense comes online when the share of dinos killed passes its `at` threshold in `config.DEFENSES`, with a red "DINO-DEFENCES ONLINE" banner. Defenses are per-dino behaviors (`dinos.js`, `enable(key)`), so each one is a self-contained function.
+
+| Online at | Defense | Effect | Counter upgrade |
+|---|---|---|---|
+| 10% ✅ | Scatter | 70% of dinos near the falling shadow freeze briefly, then run away | Cluster Rock, Bigger Boom |
+| 25% | Burrowing | Dinos dig in when a shadow appears; only a near-direct (PERFECT) hit kills them | Bunker Buster (burrowed dinos die in a small center radius) |
+| 40% | Settlements | Survivors gather into a few towns (visible huts at higher zoom) | — (makes them easier to find, but sets up the next two) |
+| 55% | Force field | Dome over each town; absorbs hits, breaks after 3 hits or 1 PERFECT | Shield Breaker (double damage to domes) |
+| 70% | Artillery T1 | Towns fire small shells at the falling rock, nudging it a few px off course; poor aim | Armored Rock (smaller nudges) |
+| 85% | Artillery T2+ | Bigger shells, better aim with each tier | Decoy Rock (artillery shoots at a fake) |
+
+Ideas list (not yet approved): radar (makes aim ring faster), jamming (indicator wobbles), egg nests that respawn dinos, tunnels between settlements, camouflage in forests.
 
 ## Milestones
 1. **M1 – Playable core:** static pixel map, ~12 wandering dino dots, target select, rhythm aim, crater + kills, kill counter
 2. **M2 – Big map:** one large map, zoom + pan + minimap, detailed dino sprites when zoomed, infinite rocks with cooldown, victory screen
-3. **M3 – First defenses:** scatter + burrowing
+3. **M3 – Upgrades + first defenses:** bones, upgrade menu, scatter ✅, burrowing
 4. **M4 – Settlements:** towns, force fields
 5. **M5 – Artillery**
 6. Polish: sound, screen shake, particles, title screen, score/high score
